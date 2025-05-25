@@ -1,4 +1,9 @@
 # OP2OpmTools
+
+![Screenshot](https://images.outpostuniverse.org/OP2OpmTools.png)
+
+## What is it?
+
 Open OP2MissionEditor .opm json file and convert to C++ code
 
 The OP2MissionEditor (https://github.com/TechCor8/OP2MissionEditor) saves its mission's in a json file format with .opm file extension. 
