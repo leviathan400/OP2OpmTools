@@ -40,6 +40,9 @@ Partial Class fMain
         '
         'txtConsole
         '
+        Me.txtConsole.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtConsole.Location = New System.Drawing.Point(12, 53)
         Me.txtConsole.Multiline = True
         Me.txtConsole.Name = "txtConsole"
