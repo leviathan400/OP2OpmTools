@@ -47,7 +47,7 @@ Partial Class fMain
         Me.txtConsole.Multiline = True
         Me.txtConsole.Name = "txtConsole"
         Me.txtConsole.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.txtConsole.Size = New System.Drawing.Size(776, 435)
+        Me.txtConsole.Size = New System.Drawing.Size(776, 445)
         Me.txtConsole.TabIndex = 1
         '
         'btnExportCpp
@@ -81,7 +81,7 @@ Partial Class fMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(800, 500)
+        Me.ClientSize = New System.Drawing.Size(800, 510)
         Me.Controls.Add(Me.btnExportTxt)
         Me.Controls.Add(Me.btnExportJson)
         Me.Controls.Add(Me.btnExportCpp)
