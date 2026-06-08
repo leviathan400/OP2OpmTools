@@ -27,6 +27,8 @@ Partial Class fMain
         Me.btnExportCpp = New System.Windows.Forms.Button()
         Me.btnExportJson = New System.Windows.Forms.Button()
         Me.btnExportTxt = New System.Windows.Forms.Button()
+        Me.btnExportLua = New System.Windows.Forms.Button()
+        Me.btnAbout = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'txtOpen
@@ -47,7 +49,7 @@ Partial Class fMain
         Me.txtConsole.Multiline = True
         Me.txtConsole.Name = "txtConsole"
         Me.txtConsole.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.txtConsole.Size = New System.Drawing.Size(776, 445)
+        Me.txtConsole.Size = New System.Drawing.Size(776, 451)
         Me.txtConsole.TabIndex = 1
         '
         'btnExportCpp
@@ -77,11 +79,31 @@ Partial Class fMain
         Me.btnExportTxt.Text = "Export Report"
         Me.btnExportTxt.UseVisualStyleBackColor = True
         '
+        'btnExportLua
+        '
+        Me.btnExportLua.Location = New System.Drawing.Point(469, 12)
+        Me.btnExportLua.Name = "btnExportLua"
+        Me.btnExportLua.Size = New System.Drawing.Size(94, 23)
+        Me.btnExportLua.TabIndex = 5
+        Me.btnExportLua.Text = "Export Lua"
+        Me.btnExportLua.UseVisualStyleBackColor = True
+        '
+        'btnAbout
+        '
+        Me.btnAbout.Location = New System.Drawing.Point(694, 12)
+        Me.btnAbout.Name = "btnAbout"
+        Me.btnAbout.Size = New System.Drawing.Size(94, 23)
+        Me.btnAbout.TabIndex = 6
+        Me.btnAbout.Text = "About"
+        Me.btnAbout.UseVisualStyleBackColor = True
+        '
         'fMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(800, 510)
+        Me.ClientSize = New System.Drawing.Size(800, 516)
+        Me.Controls.Add(Me.btnAbout)
+        Me.Controls.Add(Me.btnExportLua)
         Me.Controls.Add(Me.btnExportTxt)
         Me.Controls.Add(Me.btnExportJson)
         Me.Controls.Add(Me.btnExportCpp)
@@ -99,4 +121,6 @@ Partial Class fMain
     Friend WithEvents btnExportCpp As Button
     Friend WithEvents btnExportJson As Button
     Friend WithEvents btnExportTxt As Button
+    Friend WithEvents btnExportLua As Button
+    Friend WithEvents btnAbout As Button
 End Class

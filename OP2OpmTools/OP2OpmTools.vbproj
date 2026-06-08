@@ -48,13 +48,14 @@
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Resources\powerapps.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\Science.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
@@ -79,6 +80,12 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="fAbout.Designer.vb">
+      <DependentUpon>fAbout.vb</DependentUpon>
+    </Compile>
+    <Compile Include="fAbout.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="fMain.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -130,6 +137,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\powerapps.ico" />
+    <None Include="Resources\Science.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\lab_1.WAV" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>
