@@ -468,19 +468,31 @@ canonical form for a clean round-trip. Integer is the engine facing index.
 
 ### Cargo & weapons
 
-**Truck cargo** (`CargoType` on `CargoTruck`, → engine `Truck*` constant):
+**Truck cargo** (`CargoType` on `CargoTruck`). The editor serialises this from the SDK's `TruckCargo`
+enum **by name** (`((TruckCargo)value).ToString()`), so the string is the enum member name — *not*
+always the obvious cargo name. Two are easy to misread, and one cargo isn't named at all:
 
-| `CargoType` | Engine constant |
-|---|---|
-| `Food` | `truckFood` |
-| `CommonOre` | `truckCommonOre` |
-| `RareOre` | `truckRareOre` |
-| `CommonMetal` | `truckCommonMetal` |
-| `RareMetal` | `truckRareMetal` |
-| `CommonRubble` | `truckCommonRubble` |
-| `RareRubble` | `truckRareRubble` |
-| `Garbage` | `truckGarbage` |
-| `Spaceport` | `truckSpaceport` |
+| `CargoType` (in `.opm`) | TruckCargo value | Means | OP2 SDK constant | OP2Lua `cargo` name |
+|---|---|---|---|---|
+| `Food` | 1 | food | `truckFood` | `Food` |
+| `CommonOre` | 2 | common ore | `truckCommonOre` | `CommonOre` |
+| `RareOre` | 3 | rare ore | `truckRareOre` | `RareOre` |
+| `CommonMetal` | 4 | common metal | `truckCommonMetal` | `CommonMetal` |
+| `RareMetal` | 5 | rare metal | `truckRareMetal` | `RareMetal` |
+| `CommonRubble` | 6 | common rubble | `truckCommonRubble` | `CommonRubble` |
+| `RareRubble` | 7 | rare rubble | `truckRareRubble` | `RareRubble` |
+| `Spaceport` | 8 | **starship module** (the module `map_id` is in `CargoAmount`, 88–104) | `truckSpaceport` | `Spacecraft` |
+| `Garbage` | 9 | **Wreckage** (the SDK enum literally comments this value as "Wreckage") | `truckGarbage` | `Wreckage` |
+| `90` *(or `10`)* | 10 | **GeneBank** — the SDK `TruckCargo` enum has **no name** for value 10, so the editor writes the raw `map_id` (`mapGeneBank` = 90) | *(none; use `(TruckCargo)10`)* | `GeneBank` |
+
+> **Gotchas for converters:**
+> - `Garbage` is **Wreckage**, not literal garbage. `Spaceport` is a **starship module** (read the
+>   module id from `CargoAmount`, not `CargoType`).
+> - A **numeric** `CargoType` (the editor only ever writes `"90"` here) is a **GeneBank** — it is *not*
+>   a starship module. Modules always come through as `CargoType = "Spaceport"` with the id in
+>   `CargoAmount`. (OP2OpmTools handles all of these — see `GetTruckCargoType` / `LuaTruckCargo`.)
+> - OP2Lua uses the **Tethys** `CargoType` names (`Spacecraft`/`Wreckage`/`GeneBank`), which differ
+>   from the SDK names above, so the Lua export translates them.
 
 **Weapons** (`CargoType` on combat units — `Lynx`, `Panther`, `Tiger`, `Spider`,
 `Scorpion`, `GuardPost`): `Microwave`, `Laser`, `EMP`, `RPG`, `Starflare`, `Supernova`,

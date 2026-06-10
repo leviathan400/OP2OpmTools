@@ -418,24 +418,15 @@ Public Class fMain
                             ' Add cargo information for cargo vehicles
                             If unit.CargoType IsNot Nothing AndAlso unit.CargoType <> "None" AndAlso unit.CargoType <> "Empty" Then
                                 If unit.TypeID = "CargoTruck" Then
-                                    ' Check if this is a starship part (either by CargoType being numeric or CargoAmount)
-                                    Dim isStarshipPart As Boolean = False
-                                    Dim starshipPartId As Integer = 0
-
-                                    If IsNumeric(unit.CargoType) Then
-                                        starshipPartId = Integer.Parse(unit.CargoType)
-                                        isStarshipPart = (starshipPartId >= 88 AndAlso starshipPartId <= 104)
-                                    ElseIf unit.CargoType = "Spaceport" AndAlso unit.CargoAmount >= 88 AndAlso unit.CargoAmount <= 104 Then
-                                        starshipPartId = unit.CargoAmount
-                                        isStarshipPart = True
-                                    End If
-
-                                    If isStarshipPart Then
-                                        comment &= $" with {GetStarshipPartName(starshipPartId)}"
+                                    ' Starship modules are carried as CargoType "Spaceport" with the module
+                                    ' map_id in CargoAmount. A NUMERIC CargoType is NOT a module - e.g. "90"
+                                    ' is a GeneBank (the editor writes the map_id when TruckCargo has no name).
+                                    If unit.CargoType = "Spaceport" AndAlso unit.CargoAmount >= 88 AndAlso unit.CargoAmount <= 104 Then
+                                        comment &= $" with {GetStarshipPartName(unit.CargoAmount)}"
                                     Else
-                                        comment &= $" with {unit.CargoType}"
+                                        comment &= $" with {TruckCargoDisplayName(unit.CargoType)}"
 
-                                        ' Add cargo amount if present and not a starship part
+                                        ' Add cargo amount if present
                                         If unit.CargoAmount > 0 Then
                                             comment &= $" (amount: {unit.CargoAmount})"
                                         End If
@@ -777,7 +768,13 @@ Public Class fMain
             If hasCargo Then
                 If IsCombatUnit(unit.TypeID) Then
                     parts.Add($"weapon = {LuaStr(unit.CargoType)}")
-                ElseIf unit.TypeID = "CargoTruck" OrElse unit.TypeID = "ConVec" Then
+                ElseIf unit.TypeID = "CargoTruck" Then
+                    ' Translate the .opm's SDK TruckCargo name (e.g. Spaceport/Garbage, or the raw
+                    ' map_id "90" for a GeneBank) to the name OP2Lua's runtime understands.
+                    parts.Add($"cargo = {LuaStr(LuaTruckCargo(unit.CargoType))}")
+                    If unit.CargoAmount > 0 Then parts.Add($"amount = {unit.CargoAmount}")
+                ElseIf unit.TypeID = "ConVec" Then
+                    ' A ConVec's cargo is a structure map_id name (kit), not a TruckCargo - emit as-is.
                     parts.Add($"cargo = {LuaStr(unit.CargoType)}")
                     If unit.CargoAmount > 0 Then parts.Add($"amount = {unit.CargoAmount}")
                 End If
@@ -941,6 +938,26 @@ Public Class fMain
     ''' </summary>
     Private Function LuaBool(value As Boolean) As String
         Return If(value, "true", "false")
+    End Function
+
+    ''' <summary>
+    ''' Translates a CargoTruck's .opm CargoType to the cargo name OP2Lua's runtime accepts.
+    ''' The OP2MissionEditor serialises truck cargo using the SDK's TruckCargo enum names, but a few
+    ''' differ from the Tethys CargoType names OP2Lua's loader uses, and one value isn't named at all:
+    '''   "Spaceport" (SDK 8)  -> "Spacecraft" (CargoAmount holds the starship-module map_id)
+    '''   "Garbage"   (SDK 9)  -> "Wreckage"   (the SDK enum itself comments this value as "Wreckage")
+    '''   "90" / "10" (GeneBank: map_id 90, TruckCargo 10 - the SDK enum has no name, so the editor
+    '''                writes the raw map_id) -> "GeneBank"
+    ''' Resource cargos (Food/CommonOre/RareOre/CommonMetal/RareMetal/CommonRubble/RareRubble) already
+    ''' share the same name in both, so they pass through unchanged.
+    ''' </summary>
+    Private Function LuaTruckCargo(opmCargo As String) As String
+        Select Case opmCargo
+            Case "Spaceport" : Return "Spacecraft"
+            Case "Garbage" : Return "Wreckage"
+            Case "90", "10" : Return "GeneBank"
+            Case Else : Return opmCargo
+        End Select
     End Function
 
     ''' <summary>
@@ -1426,18 +1443,28 @@ Public Class fMain
             Case "PhoenixModule"
                 Return "truckSpaceport" ' ID 99
 
-                ' Handle numeric cargo types (likely spaceship module IDs)
+        ' GeneBank: TruckCargo 10 / map_id 90. The classic OP2 SDK TruckCargo enum has no name for it
+        ' (it stops at truckGarbage=9), so the editor writes the raw map_id - emit the raw enum value.
+            Case "90", "10"
+                Return "(TruckCargo)10"
+
+                ' Note: a numeric truck CargoType is NOT a starship module - those are carried as
+                ' CargoType "Spaceport" with the module map_id in CargoAmount. The only numeric truck
+                ' cargo is the GeneBank handled above; anything else unknown defaults to empty.
             Case Else
-                If IsNumeric(cargoTypeStr) Then
-                    Dim cargoId As Integer = Integer.Parse(cargoTypeStr)
-                    If cargoId >= 88 AndAlso cargoId <= 104 Then
-                        Return "truckSpaceport" ' Spaceship part IDs
-                    Else
-                        Return "truckEmpty" ' Default for unknown numeric values
-                    End If
-                Else
-                    Return "truckEmpty" ' Default
-                End If
+                Return "truckEmpty"
+        End Select
+    End Function
+
+    ''' <summary>
+    ''' Human-readable cargo name for C++ comments: maps the editor's TruckCargo names that differ from
+    ''' their real meaning ("Garbage" = Wreckage) and the raw GeneBank map_id ("90"/"10") to a clear name.
+    ''' </summary>
+    Private Function TruckCargoDisplayName(cargoTypeStr As String) As String
+        Select Case cargoTypeStr
+            Case "Garbage" : Return "Wreckage"
+            Case "90", "10" : Return "GeneBank"
+            Case Else : Return cargoTypeStr
         End Select
     End Function
 
